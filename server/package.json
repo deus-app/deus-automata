@@ -34,11 +34,16 @@
     "dotenv": "^16.3.1",
     "fastify": "^4.21.0",
     "firebase-admin": "^11.10.1",
+    "langchain": "^0.0.212",
+    "playwright": "^1.40.1",
     "velona": "^0.8.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@aspida/axios": "^1.14.0",
+    "@playwright/browser-chromium": "^1.40.1",
+    "@playwright/browser-firefox": "^1.40.1",
+    "@playwright/browser-webkit": "^1.40.1",
     "@types/busboy": "^1.5.0",
     "@types/node": "^20.4.10",
     "axios": "^1.4.0",
