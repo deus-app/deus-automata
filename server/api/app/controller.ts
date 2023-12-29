@@ -3,7 +3,7 @@ import { defineController } from './$relay';
 
 export default defineController(() => ({
   post: async () => {
-    const content = await appUseCase.automata();
+    const content = await appUseCase.automata('https://blog.langchain.dev/');
 
     if (content === null) {
       return {

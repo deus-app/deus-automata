@@ -6,11 +6,12 @@ import { z } from 'zod';
 const llm = new ChatOpenAI({
   modelName: 'gpt-4-vision-preview',
   openAIApiKey: OPENAI_API_KEY,
+  // Max tokens for demo purposes
   maxTokens: 1024,
 });
 
 export const llmRepo = {
-  vision: async (screenshot?: Buffer) => {
+  vision: async (screenshot: Buffer) => {
     const message = new HumanMessage({
       content: [
         {
@@ -19,12 +20,10 @@ export const llmRepo = {
         },
         {
           type: 'image_url',
-          // image_url: {
-          //   url: `data:image/jpeg;base64,${screenshot.toString('base64')}`,
-          // },
           image_url: {
-            url: 'https://blog.langchain.dev/content/images/size/w1248/format/webp/2023/10/Screenshot-2023-10-03-at-4.55.29-PM.png',
+            url: `data:image/jpeg;base64,${screenshot.toString('base64')}`,
             detail: 'low',
+            // Detail is low for demo purposes
           },
         },
       ],
