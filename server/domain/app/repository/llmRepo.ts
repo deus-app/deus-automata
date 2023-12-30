@@ -1,11 +1,11 @@
-import { OPENAI_API_KEY } from '$/service/envValues';
+import { OPENAI_KEY } from '$/service/envValues';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { HumanMessage } from 'langchain/schema';
 import { z } from 'zod';
 
 const llm = new ChatOpenAI({
   modelName: 'gpt-4-vision-preview',
-  openAIApiKey: OPENAI_API_KEY,
+  openAIApiKey: OPENAI_KEY,
   // Max tokens for demo purposes
   maxTokens: 1024,
 });
