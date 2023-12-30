@@ -1,3 +1,4 @@
+import type { VisionModel } from '$/commonTypesWithClient/models';
 import { OPENAI_KEY } from '$/service/envValues';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { HumanMessage } from 'langchain/schema';
@@ -11,12 +12,12 @@ const llm = new ChatOpenAI({
 });
 
 export const llmRepo = {
-  vision: async (screenshot: Buffer) => {
+  vision: async (screenshot: Buffer, requirements: string): Promise<VisionModel | null> => {
     const message = new HumanMessage({
       content: [
         {
           type: 'text',
-          text: "What's in this image?",
+          text: requirements,
         },
         {
           type: 'image_url',
@@ -29,7 +30,7 @@ export const llmRepo = {
       ],
     });
 
-    const res = await llm
+    const res: VisionModel | null = await llm
       .invoke([message])
       .then((content) => {
         console.log(content);

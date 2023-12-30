@@ -17,3 +17,7 @@ export const taskParser = z.object({
 });
 
 export type TaskModel = z.infer<typeof taskParser>;
+
+export type VisionModel = {
+  content: string;
+};

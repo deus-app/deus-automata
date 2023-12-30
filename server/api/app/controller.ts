@@ -1,21 +1,29 @@
 import { appUseCase } from '$/domain/app/useCase/appUseCase';
+import { z } from 'zod';
 import { defineController } from './$relay';
 
 export default defineController(() => ({
-  post: async () => {
-    const content = await appUseCase.automata('https://blog.langchain.dev/');
+  post: {
+    validators: {
+      body: z.object({
+        url: z.string(),
+        requirements: z.string(),
+      }),
+    },
+    handler: async ({ body }) => {
+      const content = await appUseCase.automata(body.url, body.requirements);
 
-    if (content === null) {
+      if (content === null) {
+        return {
+          status: 400,
+          body: 'GPT-4-Vision failed to generate content',
+        };
+      }
+
       return {
-        status: 400,
-        body: 'GPT-4-Vision failed to generate content',
+        status: 200,
+        body: content.content,
       };
-    }
-
-    // TODO: Change the body type
-    return {
-      status: 200,
-      body: content.content,
-    };
+    },
   },
 }));
