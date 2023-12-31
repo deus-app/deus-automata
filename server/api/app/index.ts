@@ -1,3 +1,4 @@
+import type { VisionModel } from '$/commonTypesWithClient/models';
 import type { DefineMethods } from 'aspida';
 
 export type Methods = DefineMethods<{
@@ -7,6 +8,6 @@ export type Methods = DefineMethods<{
       url: string;
       requirements: string;
     };
-    resBody: string;
+    resBody: VisionModel;
   };
 }>;

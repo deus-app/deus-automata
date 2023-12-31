@@ -22,7 +22,7 @@ export default defineController(() => ({
 
       return {
         status: 200,
-        body: content.content,
+        body: content,
       };
     },
   },
