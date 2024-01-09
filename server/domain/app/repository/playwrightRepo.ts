@@ -23,4 +23,7 @@ export const playwrightRepo = {
 
     return buffer;
   },
+  click: async (page: Page, x: number, y: number) => {
+    await page.mouse.click(x, y);
+  },
 };

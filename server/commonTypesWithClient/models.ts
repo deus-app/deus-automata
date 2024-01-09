@@ -19,7 +19,7 @@ export const taskParser = z.object({
 export type TaskModel = z.infer<typeof taskParser>;
 
 export const visionParser = z.object({
-  positions: z.object({
+  coordinates: z.object({
     x: z.number(),
     y: z.number(),
   }),
