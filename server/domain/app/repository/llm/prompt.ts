@@ -1,5 +1,6 @@
 import { visionParser } from '$/commonTypesWithClient/models';
 import { HumanMessage, SystemMessage } from 'langchain/schema';
+import { createLlmParser } from './parser';
 
 type LlmPromptInterface = {
   initSystemMessage: () => SystemMessage;
@@ -9,10 +10,11 @@ type LlmPromptInterface = {
 export const llmPrompt: LlmPromptInterface = {
   initSystemMessage: (): SystemMessage => {
     return new SystemMessage(
-      'You are a senior web application developer. Follow the user instructions to complete the web service.'
+      'You are a senior UI/UX designer. Debug the website and improve based on the user requirements.'
     );
   },
   initHumanMessage: (screenshot: Buffer, requirements: string): HumanMessage => {
+    const outputParser = createLlmParser(visionParser);
     return new HumanMessage({
       content: [
         {
@@ -25,13 +27,9 @@ export const llmPrompt: LlmPromptInterface = {
         {
           type: 'text',
           text: `Analyze the screenshot. 
-          Please provide one x and y pixel from top left position where you want to click to inspect and interact. 
+          Please provide x and y pixel from the top left corner of where you want to click to inspect and interact. 
           Provide a structured response with the identified elements and their positions, along with any recommendations for adjustments.
-          Return response in JSON format based on below schema strictly without any text or comments.
-          ${JSON.stringify(exampleVisionSchema)}
-
-          If you don't want to provide any recommendations or any positions to click, please provide an empty JSON based on below schema.
-          {}
+          ${outputParser.getFormatInstruction()}
           `,
         },
         {
@@ -46,11 +44,3 @@ export const llmPrompt: LlmPromptInterface = {
 const bufferToBase64 = (buffer: Buffer): string => {
   return `data:image/jpeg;base64,${buffer.toString('base64')}`;
 };
-
-const exampleVisionSchema = visionParser.parse({
-  coordinates: {
-    x: 100,
-    y: 100,
-  },
-  recommendations: ['Change the button color to red'],
-});

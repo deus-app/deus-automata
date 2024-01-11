@@ -2,6 +2,7 @@ import { visionParser, type VisionModel } from '$/commonTypesWithClient/models';
 import { OPENAI_KEY } from '$/service/envValues';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { z } from 'zod';
+import { createLlmParser } from './parser';
 import { llmPrompt } from './prompt';
 
 const llm = new ChatOpenAI({
@@ -18,15 +19,15 @@ export const llmRepo = {
 
     const res: VisionModel | null = await llm
       .invoke([systemMessage, humanMessage])
-      .then((content) =>
-        parseVisionJsonOutput(
-          z
-            .object({
-              content: z.string(),
-            })
-            .parse(content).content
-        )
-      )
+      .then(async (content) => {
+        const contentString = z
+          .object({
+            content: z.string(),
+          })
+          .parse(content).content;
+        const outputParser = createLlmParser(visionParser);
+        return await outputParser.parse(contentString);
+      })
       .catch((e) => {
         console.error(e);
         return null;
@@ -34,17 +35,4 @@ export const llmRepo = {
 
     return res;
   },
-};
-
-const parseVisionJsonOutput = (content: string): VisionModel | null => {
-  // Result is return in ```json { "content": "..." }``` format
-  const parsedContent = JSON.parse(content.trim().replace('```json\n', '').replace('```', ''));
-  const validationResult = visionParser.safeParse(parsedContent);
-
-  if (validationResult.success === false) {
-    console.error(validationResult.error);
-    return null;
-  }
-
-  return validationResult.data;
 };

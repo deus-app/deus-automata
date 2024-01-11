@@ -20,10 +20,11 @@ export type TaskModel = z.infer<typeof taskParser>;
 
 export const visionParser = z.object({
   coordinates: z.object({
-    x: z.number(),
-    y: z.number(),
+    x: z.number().describe("x coordinate from the element's top left corner"),
+    y: z.number().describe("y coordinate from the element's top left corner"),
   }),
-  recommendations: z.array(z.string()),
+  recommendations: z.array(z.string()).describe('Recommendations for adjustments'),
+  description: z.string().describe('Description of the action done on the element'),
 });
 
 export type VisionModel = z.infer<typeof visionParser>;
