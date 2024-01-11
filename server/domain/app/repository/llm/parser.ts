@@ -1,7 +1,7 @@
 import { StructuredOutputParser } from 'langchain/output_parsers';
 import type { ZodSchema } from 'zod';
 
-export function createLlmParser<T>(schema: ZodSchema<T>) {
+export const createLlmParser = <T>(schema: ZodSchema<T>) => {
   const outputParser = StructuredOutputParser.fromZodSchema(schema);
 
   return {
@@ -12,4 +12,4 @@ export function createLlmParser<T>(schema: ZodSchema<T>) {
       return await outputParser.parse(input);
     },
   };
-}
+};

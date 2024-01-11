@@ -16,14 +16,20 @@ export const playwrightRepo = {
 
     console.log('Closing browser...');
   },
-  takeScreenshot: async (page: Page, url: string): Promise<Buffer> => {
-    await page.goto(url);
+  takeScreenshot: async (page: Page): Promise<Buffer> => {
     await page.waitForLoadState('domcontentloaded');
-    const buffer = await page.screenshot();
 
-    return buffer;
+    return await page.screenshot();
+  },
+  go: async (page: Page, url: string) => {
+    await page.goto(url);
   },
   click: async (page: Page, x: number, y: number) => {
     await page.mouse.click(x, y);
+    console.log('clicking', await page.url());
+  },
+  scroll: async (page: Page, x: number, y: number) => {
+    await page.mouse.wheel(x, y);
+    console.log('scrolling', await page.url());
   },
 };

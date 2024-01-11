@@ -4,16 +4,31 @@ import { playwrightRepo } from '../repository/playwrightRepo';
 export const appUseCase = {
   automata: async (url: string, requirements: string) => {
     const { browser, context, page } = await playwrightRepo.init();
-    const screenshot = await playwrightRepo.takeScreenshot(page, url);
+    await playwrightRepo.go(page, url);
+
+    const screenshot = await playwrightRepo.takeScreenshot(page);
     const visionResponse = await llmRepo.vision(screenshot, requirements);
-    if (visionResponse === null) {
-      await playwrightRepo.teardown(browser, context);
-      return null;
+
+    switch (visionResponse.status) {
+      case 'clicked':
+        await playwrightRepo.click(
+          page,
+          visionResponse.coordinates.x,
+          visionResponse.coordinates.y
+        );
+        break;
+      case 'scrolled':
+        await playwrightRepo.scroll(
+          page,
+          visionResponse.coordinates.x,
+          visionResponse.coordinates.y
+        );
+        break;
+      case 'completed':
+        break;
     }
 
-    await playwrightRepo.click(page, visionResponse.coordinates.x, visionResponse.coordinates.y);
     await playwrightRepo.teardown(browser, context);
-
     return visionResponse;
   },
 };

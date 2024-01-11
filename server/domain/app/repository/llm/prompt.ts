@@ -26,15 +26,14 @@ export const llmPrompt: LlmPromptInterface = {
         },
         {
           type: 'text',
-          text: `Analyze the screenshot. 
-          Please provide x and y pixel from the top left corner of where you want to click to inspect and interact. 
-          Provide a structured response with the identified elements and their positions, along with any recommendations for adjustments.
+          text: `Analyze the screenshot and interact with elements in the website if needed, then return a response giving the changes needed.
+          Provide x and y pixels relative to the top-left corner of the viewport of the element you want to inspect or scroll to.
+          If you want to inspect a website, return a response with status 'clicked'. If you want to scroll, return a response with status 'scrolled'.
+          If you are done inspecting a website, return a response with status 'completed'.
           ${outputParser.getFormatInstruction()}
+
+          User requirements: "${requirements}"
           `,
-        },
-        {
-          type: 'text',
-          text: `This is a requirements: ${requirements}`,
         },
       ],
     });
