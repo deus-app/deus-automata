@@ -1,37 +1,32 @@
-import { OPENAI_KEY } from '$/service/envValues';
-import { ChatOpenAI } from 'langchain/chat_models/openai';
-import type { BaseLanguageModelInput } from 'langchain/dist/base_language';
+import type { ConversationChain } from 'langchain/chains';
+import type { HumanMessage } from 'langchain/schema';
 import { z, type ZodSchema } from 'zod';
 import { createLlmParser } from './parser';
 
-const llm = new ChatOpenAI({
-  modelName: 'gpt-4-vision-preview',
-  openAIApiKey: OPENAI_KEY,
-  // Max tokens for demo purposes
-  maxTokens: 256,
-});
-
 export const invokeOrThrow = async <T extends ZodSchema>(
-  prompt: BaseLanguageModelInput,
+  humanMessage: HumanMessage,
   parser: T,
+  chain: ConversationChain,
   count = 3
 ): Promise<z.infer<T>> => {
-  return await llm
-    .invoke(prompt)
-    .then(async (content) => {
-      const contentParser = createLlmParser(parser);
-      const contentString = z
+  return await chain
+    .invoke({ input: [humanMessage] })
+    .then(async (response) => {
+      const outputParser = createLlmParser(parser);
+      const responseString = z
         .object({
-          content: z.string(),
+          response: z.string(),
         })
-        .parse(content).content;
-      return await contentParser.parse(contentString);
+        .parse(response).response;
+      const result = await outputParser.parse(responseString);
+      console.log('result', result);
+      return result;
     })
     .catch((e) => {
       console.error('Failed to parse bad output:', e);
       if (count === 0) {
         throw e;
       }
-      return invokeOrThrow(prompt, parser, count - 1);
+      return invokeOrThrow(humanMessage, parser, chain, count - 1);
     });
 };

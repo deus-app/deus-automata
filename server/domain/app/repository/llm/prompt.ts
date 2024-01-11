@@ -1,17 +1,14 @@
 import { visionParser } from '$/commonTypesWithClient/models';
-import { HumanMessage, SystemMessage } from 'langchain/schema';
+import type { BaseMessagePromptTemplateLike } from 'langchain/dist/prompts/chat';
+import { HumanMessage } from 'langchain/schema';
 import { createLlmParser } from './parser';
 
-type LlmPromptInterface = {
-  initSystemMessage: () => SystemMessage;
-  initHumanMessage: (screenshot: Buffer, requirements: string) => HumanMessage;
-};
-
-export const llmPrompt: LlmPromptInterface = {
-  initSystemMessage: (): SystemMessage => {
-    return new SystemMessage(
-      'You are a senior UI/UX designer. Debug the website and improve based on the user requirements.'
-    );
+export const llmPrompt = {
+  initSystemTemplateMessage: (): BaseMessagePromptTemplateLike => {
+    return [
+      'system',
+      'You are a senior UI/UX designer. Debug the website and improve based on the user requirements.',
+    ];
   },
   initHumanMessage: (screenshot: Buffer, requirements: string): HumanMessage => {
     const outputParser = createLlmParser(visionParser);
@@ -31,9 +28,11 @@ export const llmPrompt: LlmPromptInterface = {
           If you want to inspect a website, return a response with status 'clicked'. If you want to scroll, return a response with status 'scrolled'.
           If you are done inspecting a website, return a response with status 'completed'.
           ${outputParser.getFormatInstruction()}
-
-          User requirements: "${requirements}"
           `,
+        },
+        {
+          type: 'text',
+          text: `User requirements: "${requirements}"`,
         },
       ],
     });

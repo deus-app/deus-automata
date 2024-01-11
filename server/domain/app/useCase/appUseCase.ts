@@ -4,10 +4,11 @@ import { playwrightRepo } from '../repository/playwrightRepo';
 export const appUseCase = {
   automata: async (url: string, requirements: string) => {
     const { browser, context, page } = await playwrightRepo.init();
-    await playwrightRepo.go(page, url);
+    const chain = await llmRepo.initVision();
 
+    await playwrightRepo.go(page, url);
     const screenshot = await playwrightRepo.takeScreenshot(page);
-    const visionResponse = await llmRepo.vision(screenshot, requirements);
+    const visionResponse = await llmRepo.vision(screenshot, requirements, chain);
 
     switch (visionResponse.status) {
       case 'clicked':
