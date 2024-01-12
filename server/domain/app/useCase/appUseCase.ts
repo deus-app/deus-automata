@@ -1,35 +1,41 @@
+import type { UserRequirementsModel, VisionModel } from '$/commonTypesWithClient/models';
+import type { ConversationChain } from 'langchain/chains';
 import { llmRepo } from '../repository/llm/llmRepo';
-import { playwrightRepo } from '../repository/playwrightRepo';
+import type { PlaywrightRepoInterface } from '../repository/playwrightRepo';
+import { createPlaywrightRepo } from '../repository/playwrightRepo';
 
 export const appUseCase = {
-  automata: async (url: string, requirements: string) => {
-    const { browser, context, page } = await playwrightRepo.init();
-    const chain = await llmRepo.initVision();
+  init: async (userRequirements: UserRequirementsModel) => {
+    const playwrightRepo = await createPlaywrightRepo();
+    const chain = await llmRepo.initVisionChain();
 
-    await playwrightRepo.go(page, url);
-    const screenshot = await playwrightRepo.takeScreenshot(page);
-    const visionResponse = await llmRepo.vision(screenshot, requirements, chain);
+    await playwrightRepo.gotoUrl(userRequirements.url);
+    const vision = await appUseCase.automata(playwrightRepo, userRequirements.requirements, chain);
+    await playwrightRepo.teardown();
 
-    switch (visionResponse.status) {
+    return vision;
+  },
+  automata: async (
+    playwrightRepo: PlaywrightRepoInterface,
+    requirements: string,
+    chain: ConversationChain
+  ): Promise<VisionModel> => {
+    const screenshot = await playwrightRepo.takeScreenshot();
+    const vision = await llmRepo.vision(screenshot, requirements, chain);
+
+    switch (vision.status) {
+      case 'completed':
+        return vision;
       case 'clicked':
-        await playwrightRepo.click(
-          page,
-          visionResponse.coordinates.x,
-          visionResponse.coordinates.y
-        );
+        await playwrightRepo.click(vision.coordinates);
         break;
       case 'scrolled':
-        await playwrightRepo.scroll(
-          page,
-          visionResponse.coordinates.x,
-          visionResponse.coordinates.y
-        );
+        await playwrightRepo.scroll(vision.coordinates);
         break;
-      case 'completed':
-        break;
+      default:
+        throw new Error('Invalid status');
     }
 
-    await playwrightRepo.teardown(browser, context);
-    return visionResponse;
+    return await appUseCase.automata(playwrightRepo, requirements, chain);
   },
 };

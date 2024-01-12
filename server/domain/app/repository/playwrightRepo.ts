@@ -1,35 +1,39 @@
-import type { Browser, BrowserContext, Page } from 'playwright';
+import type { CoordinatesModel } from '$/commonTypesWithClient/models';
 import { chromium } from 'playwright';
 
-export const playwrightRepo = {
-  init: async () => {
-    console.log('Launching browser...');
-    const browser = await chromium.launch({ headless: true });
-    const context = await browser.newContext();
-    const page = await context.newPage();
+export type PlaywrightRepoInterface = {
+  teardown: () => Promise<void>;
+  takeScreenshot: () => Promise<Buffer>;
+  gotoUrl: (url: string) => Promise<void>;
+  click: (coordinates: CoordinatesModel) => Promise<void>;
+  scroll: (coordinates: CoordinatesModel) => Promise<void>;
+};
 
-    return { browser, context, page };
-  },
-  teardown: async (browser: Browser, context: BrowserContext) => {
-    await context.close();
-    await browser.close();
+export const createPlaywrightRepo = async (): Promise<PlaywrightRepoInterface> => {
+  console.log('Launching browser...');
+  const browser = await chromium.launch({ headless: true });
+  const context = await browser.newContext();
+  const page = await context.newPage();
 
-    console.log('Closing browser...');
-  },
-  takeScreenshot: async (page: Page): Promise<Buffer> => {
-    await page.waitForLoadState('domcontentloaded');
-
-    return await page.screenshot();
-  },
-  go: async (page: Page, url: string) => {
-    await page.goto(url);
-  },
-  click: async (page: Page, x: number, y: number) => {
-    await page.mouse.click(x, y);
-    console.log('clicking', await page.url());
-  },
-  scroll: async (page: Page, x: number, y: number) => {
-    await page.mouse.wheel(x, y);
-    console.log('scrolling', await page.url());
-  },
+  return {
+    teardown: async () => {
+      await context.close();
+      await browser.close();
+      console.log('Closing browser...');
+    },
+    takeScreenshot: async (): Promise<Buffer> => {
+      await page.waitForLoadState('domcontentloaded');
+      return await page.screenshot();
+    },
+    gotoUrl: async (url: string) => {
+      await page.goto(url);
+    },
+    click: async (coordinates: CoordinatesModel) => {
+      await page.mouse.click(coordinates.x, coordinates.y);
+      console.log('clicking', await page.url());
+    },
+    scroll: async (coordinates: CoordinatesModel) => {
+      await page.mouse.wheel(coordinates.x, coordinates.y);
+    },
+  };
 };

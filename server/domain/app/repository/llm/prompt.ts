@@ -18,17 +18,19 @@ export const llmPrompt = {
           type: 'image_url',
           image_url: {
             url: bufferToBase64(screenshot),
-            detail: 'low', // Detail is low for demo purposes
+            detail: 'low', // TODO: Change detail
           },
         },
         {
           type: 'text',
-          text: `Analyze the screenshot and interact with elements in the website if needed, then return a response giving the changes needed.
+          text: `
+          Analyze the screenshot and interact with elements in the website if needed, then return a response giving the changes needed.
           Provide x and y pixels relative to the top-left corner of the viewport of the element you want to inspect or scroll to.
           If you want to inspect a website, return a response with status 'clicked'. If you want to scroll, return a response with status 'scrolled'.
           If you are done inspecting a website, return a response with status 'completed'.
           ${outputParser.getFormatInstruction()}
           `,
+          // TODO: Update prompt
         },
         {
           type: 'text',

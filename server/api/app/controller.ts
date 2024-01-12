@@ -11,13 +11,8 @@ export default defineController(() => ({
       }),
     },
     handler: async ({ body }) => {
-      const content = await appUseCase.automata(body.url, body.requirements);
-      if (content === null) {
-        return {
-          status: 400,
-          body: 'GPT-4-Vision failed to generate content',
-        };
-      }
+      const content = await appUseCase.init(body);
+
       return {
         status: 200,
         body: content,

@@ -3,12 +3,12 @@ import type { HumanMessage } from 'langchain/schema';
 import { z, type ZodSchema } from 'zod';
 import { createLlmParser } from './parser';
 
-export const invokeOrThrow = async <T extends ZodSchema>(
+export const invokeOrThrow = async <Schema extends ZodSchema>(
   humanMessage: HumanMessage,
-  parser: T,
+  parser: Schema,
   chain: ConversationChain,
   count = 3
-): Promise<z.infer<T>> => {
+): Promise<z.infer<Schema>> => {
   return await chain
     .invoke({ input: [humanMessage] })
     .then(async (response) => {

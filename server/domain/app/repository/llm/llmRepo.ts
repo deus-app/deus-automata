@@ -7,15 +7,15 @@ import { ChatPromptTemplate, MessagesPlaceholder } from 'langchain/prompts';
 import { invokeOrThrow } from './invokeOrThrow';
 import { llmPrompt } from './prompt';
 
+// TODO: Change max tokens value
 const llm = new ChatOpenAI({
   modelName: 'gpt-4-vision-preview',
   openAIApiKey: OPENAI_KEY,
-  // Max tokens for demo purposes
   maxTokens: 256,
 });
 
 export const llmRepo = {
-  initVision: async (): Promise<ConversationChain> => {
+  initVisionChain: async (): Promise<ConversationChain> => {
     const memory = new BufferMemory();
     const systemMessage = llmPrompt.initSystemTemplateMessage();
     const prompt = ChatPromptTemplate.fromMessages([
@@ -31,7 +31,6 @@ export const llmRepo = {
     chain: ConversationChain
   ): Promise<VisionModel> => {
     const humanMessage = llmPrompt.initHumanMessage(screenshot, requirements);
-
     return await invokeOrThrow(humanMessage, visionParser, chain);
   },
 };
