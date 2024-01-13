@@ -1,5 +1,5 @@
-import type { CoordinatesModel } from '$/commonTypesWithClient/models';
 import { chromium } from 'playwright';
+import type { CoordinatesModel } from '../model/llm';
 
 export type PlaywrightRepoInterface = {
   teardown: () => Promise<void>;

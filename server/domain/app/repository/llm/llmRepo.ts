@@ -1,9 +1,11 @@
-import { visionParser, type VisionModel } from '$/commonTypesWithClient/models';
 import { OPENAI_KEY } from '$/service/envValues';
 import { ConversationChain } from 'langchain/chains';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { BufferMemory } from 'langchain/memory';
 import { ChatPromptTemplate, MessagesPlaceholder } from 'langchain/prompts';
+
+import type { VisionModel } from '../../model/llm';
+import { visionParser } from '../../model/llm';
 import { invokeOrThrow } from './invokeOrThrow';
 import { llmPrompt } from './prompt';
 
@@ -14,7 +16,16 @@ const llm = new ChatOpenAI({
   maxTokens: 256,
 });
 
-export const llmRepo = {
+export type LlmRepoInterface = {
+  initVisionChain: () => Promise<ConversationChain>;
+  vision: (
+    screenshot: Buffer,
+    requirements: string,
+    chain: ConversationChain
+  ) => Promise<VisionModel>;
+};
+
+export const llmRepo: LlmRepoInterface = {
   initVisionChain: async (): Promise<ConversationChain> => {
     const memory = new BufferMemory();
     const systemMessage = llmPrompt.initSystemTemplateMessage();

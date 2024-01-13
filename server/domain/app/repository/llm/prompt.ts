@@ -1,6 +1,6 @@
-import { visionParser } from '$/commonTypesWithClient/models';
 import type { BaseMessagePromptTemplateLike } from 'langchain/dist/prompts/chat';
 import { HumanMessage } from 'langchain/schema';
+import { visionParser } from '../../model/llm';
 import { createLlmParser } from './parser';
 
 export const llmPrompt = {
