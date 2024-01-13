@@ -1,20 +1,12 @@
-import { OPENAI_KEY } from '$/service/envValues';
 import { ConversationChain } from 'langchain/chains';
-import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { BufferMemory } from 'langchain/memory';
 import { ChatPromptTemplate, MessagesPlaceholder } from 'langchain/prompts';
 
+import { llm } from '$/service/openai';
 import type { VisionModel } from '../../model/llm';
 import { visionParser } from '../../model/llm';
 import { invokeOrThrow } from './invokeOrThrow';
 import { llmPrompt } from './prompt';
-
-// TODO: Change max tokens value
-const llm = new ChatOpenAI({
-  modelName: 'gpt-4-vision-preview',
-  openAIApiKey: OPENAI_KEY,
-  maxTokens: 256,
-});
 
 export type LlmRepoInterface = {
   initVisionChain: () => Promise<ConversationChain>;
